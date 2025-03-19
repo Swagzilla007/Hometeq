@@ -15,67 +15,72 @@ $currentdatetime = date('Y-m-d H:i:s');
 $SQL = "INSERT into Orders (userId, orderDateTime, orderStatus)
 VALUES ('".$_SESSION['userid']."','".$currentdatetime."', 'Placed')";
 //if execution of the INSERT INTO SQL query to add new order is correct
-if (mysqli_query($conn, $SQL))
+if (mysqli_query($conn, $SQL) and isset($_SESSION['basket']) and count($_SESSION['basket'])>0) 
 {
-//Display "order success" message
-echo "<p><b>Order successfully placed!</b></p>";
+    $orderno = mysqli_insert_id($conn); // Get the ID of newly inserted order
+    echo "<p><b>Order successfully placed!</b></p>";
+    echo "<p>Order No: <b>".$orderno."</b></p>";
+    
+    $total = 0;
+    echo "<table id='checkouttable'>";
+    echo "<tr>";
+    echo "<th>Product name</th>";
+    echo "<th>Price</th>";
+    echo "<th>Quantity</th>";
+    echo "<th>Subtotal</th>";
+    echo "</tr>";
+    
+    foreach($_SESSION['basket'] as $index => $value)
+    {
+        // Fixed table name from Product to Products
+        $stmt = mysqli_prepare($conn, "SELECT prodId, prodName, prodPrice FROM Products WHERE prodId = ?");
+        if ($stmt) {
+            mysqli_stmt_bind_param($stmt, "i", $index);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
+            
+            if($arrayb = mysqli_fetch_array($result)) {
+                $subtotal = $value * $arrayb['prodPrice'];
+                
+                $stmtLine = mysqli_prepare($conn, "INSERT INTO Order_Line (orderNo, prodId, quantityOrdered, subTotal) VALUES (?, ?, ?, ?)");
+                if ($stmtLine) {
+                    mysqli_stmt_bind_param($stmtLine, "iiid", $orderno, $index, $value, $subtotal);
+                    mysqli_stmt_execute($stmtLine);
+                    mysqli_stmt_close($stmtLine);
+                    
+                    echo "<tr>";
+                    echo "<td>".$arrayb['prodName']."</td>";
+                    echo "<td>&pound;".number_format($arrayb['prodPrice'], 2)."</td>";
+                    echo "<td>".$value."</td>";
+                    echo "<td>&pound;".number_format($subtotal, 2)."</td>";
+                    echo "</tr>";
+                    
+                    $total = $total + $subtotal;
+                }
+            }
+            mysqli_stmt_close($stmt);
+        }
+    }
+    
+    echo "<tr>";
+    echo "<th colspan='3'>TOTAL</th>";
+    echo "<th>&pound;".number_format($total, 2)."</th>";
+    echo "</tr>";
+    echo "</table>";
+    
+    $stmtTotal = mysqli_prepare($conn, "UPDATE Orders SET orderTotal = ? WHERE orderNo = ?");
+    if ($stmtTotal) {
+        mysqli_stmt_bind_param($stmtTotal, "di", $total, $orderno);
+        mysqli_stmt_execute($stmtTotal);
+        mysqli_stmt_close($stmtTotal);
+    }
+    
+    unset($_SESSION['basket']);
 }
 else
 {
-//Display "order error" message
-echo "<p><b>Error with the placing of your order!</b></p>";
+    echo "<p><b>Error with the placing of your order!</b></p>";
 }
-$currentdatetime = date('Y-m-d H:i:s');
-$SQL = "INSERT into Orders (userId, orderDateTime, orderStatus)  
-VALUES ('".$_SESSION['userid']."','".$currentdatetime."', 'Placed')"; //creates a new order
-if (mysqli_query($conn, $SQL) and isset($_SESSION['basket']) and count($_SESSION['basket'])>0) //check if query is placed basket exist in session and it is more than 0
-{
-echo "<p><b>Order successfully placed!</b></p>";
-$maxSQL = "SELECT max(orderNo) as maxOrderNo, userId FROM Orders WHERE userId =".$_SESSION['userid'];
-$exemaxSQL = mysqli_query($conn, $maxSQL) or die (mysqli_error($conn));
-$arrayo = mysqli_fetch_array($exemaxSQL);
-$orderno = $arrayo['maxOrderNo'];
-echo "<p>Order No: <b>".$orderno."</b></p>";
-$total = 0;
-echo "<table id='checkouttable'>";
-echo "<tr>";
-echo "<th>Product name</th>";
-echo "<th>Price</th>";
-echo "<th>Quantity</th>";
-echo "<th>Subtotal</th>";
-echo "</tr>";
-foreach($_SESSION['basket'] as $index => $value)
-{
-$SQLb="select prodId, prodName, prodPrice from Product WHERE prodId = ".$index;
-$exeSQLb = mysqli_query($conn, $SQLb) or die (mysqli_error($conn));
-$arrayb = mysqli_fetch_array($exeSQLb);
-$subtotal = $value * $arrayb['prodPrice'];
-$SQLol = "INSERT into Order_Line(orderNo, prodId, quantityOrdered, subTotal)
-VALUES ('".$orderno."', '".$index."','".$value."','".$subtotal."')";
-$exeSQLol = mysqli_query($conn, $SQLol) or die (mysqli_error($conn));//die stop script execution when failed
-echo "<tr>";
-echo "<td>".$arrayb['prodName']."</td>";
-echo "<td>&pound".$arrayb['prodPrice']."</td>";
-echo "<td>".$value."</td>";
-echo "<td>&pound".$subtotal."</td>";
-echo "</tr>";
-$total = $total + $subtotal;
-}
-echo "<tr>";
-echo "<th colspan='3'>TOTAL</th>";
-echo "<th>&pound".$total."</th>";
-echo "</tr>";
-echo "</table>";
-$SQLo="UPDATE Orders
-SET orderTotal=".$total."
-WHERE orderNo=".$orderno;
-$exeSQLo = mysqli_query($conn, $SQLo) or die (mysqli_error($conn));
-}
-else
-{
-echo "<p><b>Error with the placing of your order!</b></p>";
-}
-unset($_SESSION['basket']);
 
 include("footfile.html"); //include head layout
 echo "</body>";

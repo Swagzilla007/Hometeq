@@ -71,13 +71,15 @@ echo "<p>Welcome, ". $_SESSION['fname']." ".$_SESSION['sname']."</p>"; //display
 if ($_SESSION['usertype']=='C') //if user type is C, they are a customer
 {
 echo "<p>User Type: homteq Customer</p>";
+echo "<br><p>Continue shopping for <a href=index.php>Home Tech</a>";
+echo "<br>View your <a href=basket.php>Smart Basket</a></p>";
 }
 if ($_SESSION['usertype']=='A') //if user type is A, they are an admin
 {
 echo "<p>User type: homteq Administrator</p>";
+echo "<br><p><a href='processorders.php'>Process Orders</a>";
+echo "<br><a href='index.php'>Home Tech</a></p>";
 }
-echo "<br><p>Continue shopping for <a href=index.php>Home Tech</a>";
-echo "<br>View your <a href=basket.php>Smart Basket</a></p>";
 }
 }
 }

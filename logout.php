@@ -1,7 +1,7 @@
 <?php
 session_start();
 include ("detectlogin.php");
-$pagename="template"; //Create and populate a variable called $pagename
+$pagename="Logout"; //Changed from template to Logout
 echo "<link rel=stylesheet type=text/css href=mystylesheet.css>"; //Call in stylesheet
 echo "<title>".$pagename."</title>"; //display name of the page as window title
 echo "<body>";
