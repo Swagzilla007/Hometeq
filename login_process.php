@@ -35,6 +35,25 @@ echo "<br><p> Go back to <a href=login.php>login</a></p>";
 else
 {
 $arrayuser = mysqli_fetch_array($exeSQL); //create array of user for this email
+
+// Check if trying to login as staff but account is customer
+if ($_POST['login_type'] == 'staff' && $arrayuser['userType'] != 'A') {
+    echo "<p><b>Login failed!</b>";
+    echo "<br>This login is for staff only</p>";
+    echo "<br><p>Go back to <a href=stafflogin.php>staff login</a></p>";
+    include("footfile.html");
+    exit();
+}
+
+// Check if trying to login as customer but account is staff
+if ($_POST['login_type'] == 'customer' && $arrayuser['userType'] == 'A') {
+    echo "<p><b>Login failed!</b>";
+    echo "<br>Please use staff login</p>";
+    echo "<br><p>Go back to <a href=stafflogin.php>staff login</a></p>";
+    include("footfile.html");
+    exit();
+}
+
 if ($arrayuser['userPassword'] <> $password) //if the pwd in the array matches the pwd entered in the form
 {
 echo "<p><b>Login failed!</b>"; //display login error

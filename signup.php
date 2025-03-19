@@ -5,8 +5,16 @@ echo "<title>".$pagename."</title>"; //display name of the page as window title
 echo "<body>";
 include ("headfile.html"); //include header layout file
 echo "<h4>".$pagename."</h4>"; //display name of the page on the web page
+
+echo "<div class='formStyle'>";
 echo "<form method=post action=signup_process.php>" ;
 echo "<table style='border: 0px'>";
+echo "<tr><td style='border: 0px'>User Type:</td>";
+echo "<td style='border: 0px'>";
+echo "<input type='radio' name='r_usertype' value='C' checked> Customer ";
+echo "<input type='radio' name='r_usertype' value='A'> Administrator";
+echo "</td></tr>";
+
 echo "<tr><td style='border: 0px'>*First Name </td>";
 echo "<td style='border: 0px'><input type=text name=r_firstname size=35></td></tr>";
 echo "<tr><td style='border: 0px'>*Last Name </td>";
@@ -28,7 +36,8 @@ echo "<td style='border: 0px'><input type=submit value='Sign Up' name='submitbtn
 echo "<td style='border: 0px'><input type=reset value='Clear Form' name='submitbtn' id='submitbtn'> </td>";
 echo "</tr>";
 echo "</table>";
-echo "</form>" ;
+echo "</form>";
+echo "</div>";
 
 include("footfile.html"); //include head layout
 echo "</body>";

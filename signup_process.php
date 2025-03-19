@@ -49,11 +49,14 @@ echo "<br><br><br><br>";
 }
 else
 {
+//Get the selected user type, default to 'C' if not set
+$usertype = isset($_POST['r_usertype']) ? $_POST['r_usertype'] : 'C';
+
 //Write SQL query to insert new user into users table and execute SQL query
 $SQL="insert into Users
 (userType, userFName, userSName, userAddress, userPostCode, userTelNo, userEmail, userPassword)
 values
-('C','".$fname."','".$lname."','".$address."','".$postcode."','".$telno."','".$email."', '".$password1."')";
+('".$usertype."','".$fname."','".$lname."','".$address."','".$postcode."','".$telno."','".$email."', '".$password1."')";
 //if SQL execution is correct
 if (mysqli_query($conn, $SQL))
 {
