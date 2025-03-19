@@ -24,8 +24,19 @@
             <li><a href='basket.php'>Smart Basket</a></li>
             <li><a href='login.php'>Staff Login</a></li>
         </div>
+    <?php } else if (isset($_SESSION['usertype']) && $_SESSION['usertype'] == 'A') { ?>
+        <!-- Menu for admin users -->
+        <div>
+            <li><a href='index.php'>Home Tech</a></li>
+            <li><a href='aboutus.php'>About Us</a></li>
+            <li><a href='logout.php'>Logout</a></li>
+        </div>
+        <div>
+            <li><a href='addproduct.php'>Add Product</a></li>
+            <li><a href='processorders.php'>Process Orders</a></li>
+        </div>
     <?php } else { ?>
-        <!-- Menu for logged in users -->
+        <!-- Menu for regular logged in users -->
         <div>
             <li><a href='index.php'>Home Tech</a></li>
             <li><a href='aboutus.php'>About Us</a></li>
