@@ -43,7 +43,15 @@ if (mysqli_num_rows($exeSQL) == 0) {
         echo "<td>".$order['userFName']." ".$order['userSName']."</td>";
         echo "<td>".$order['userAddress']."<br>".$order['userPostCode']."</td>";
         echo "<td>".$order['orderDateTime']."</td>";
-        echo "<td>".$order['orderStatus']."</td>";
+        echo "<td>";
+        echo $order['orderStatus'];
+        if($order['orderStatus'] != 'Completed') {
+            echo "<form action='complete_order.php' method='post' style='margin-top: 5px;'>";
+            echo "<input type='hidden' name='order_id' value='".$order['orderNo']."'>";
+            echo "<input type='submit' value='Complete' id='submitbtn'>";
+            echo "</form>";
+        }
+        echo "</td>";
         echo "<td>&pound;".number_format($order['orderTotal'], 2)."</td>";
         echo "<td><a href='orderdetails.php?orderno=".$order['orderNo']."'>View Details</a></td>";
         echo "</tr>";
