@@ -1,4 +1,5 @@
 <?php
+session_start();
 include("db.php");
 $pagename="A smart buy for a smart phone"; //Create and populate a variable called $pagename
 echo "<link rel=stylesheet type=text/css href=mystylesheet.css>"; //Call in stylesheet
