@@ -1,53 +1,52 @@
 <!--HTML document to define the layout of the header and the navigation bar-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Questrial&family=Roboto&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet">
 <div id="container">
-<a style="text-decoration:none" href="index.php">
-<div id="navbar">
-<div id="header">
-<h1>homteq`</h1>
-<h2>your home for home tech</h2></a>
-<h3><?php echo "London, ".date('l d F Y h:i:s');?> </h3>
-</div>
-<div id="navigation">
-<ul>
-    <?php if (!isset($_SESSION['userid'])) { ?>
-        <!-- Menu for non-logged in users -->
-        <div>
-            <li><a href='index.php'>Home Tech</a></li>
-            <li><a href='aboutus.php'>About Us</a></li>
-            <li><a href='signup.php'>Sign Up</a></li>
-            <li><a href='login.php'>Login</a></li>
+    <div id="navbar">
+        <div id="header">
+            <a style="text-decoration:none" href="index.php">
+                <h1>homteq`</h1>
+                <h2>your home for home tech</h2>
+            </a>
+            <h3><?php echo "London, ".date('l d F Y h:i:s');?> </h3>
         </div>
-        <div>
-            <li><a href='basket.php'>Smart Basket</a></li>
-            <li><a href='stafflogin.php'>Staff Login</a></li>
-        </div>
-    <?php } else if (isset($_SESSION['usertype']) && $_SESSION['usertype'] == 'A') { ?>
-        <!-- Menu for admin users -->
-        <div>
-            <li><a href='index.php'>Home Tech</a></li>
-            <li><a href='aboutus.php'>About Us</a></li>
-            <li><a href='logout.php'>Logout</a></li>
-        </div>
-        <div>
-            <li><a href='addproduct.php'>Add Product</a></li>
-            <li><a href='processorders.php'>Process Orders</a></li>
-        </div>
-    <?php } else { ?>
-        <!-- Menu for regular logged in users -->
-        <div>
-            <li><a href='index.php'>Home Tech</a></li>
-            <li><a href='aboutus.php'>About Us</a></li>
-            <li><a href='logout.php'>Logout</a></li>
-        </div>
-        <div>
-            <li><a href='basket.php'>Smart Basket</a></li>
-            <li><a href='myorders.php'>My Orders</a></li>
-        </div>
-    <?php } ?>
-</ul>
-</div>
-</div>
-<div id='content'>
+        <nav id="navigation">
+            <ul>
+                <?php if (!isset($_SESSION['userid'])) { ?>
+                    <div class="nav-group">
+                        <li><a href='index.php'>Home Tech</a></li>
+                        <li><a href='aboutus.php'>About Us</a></li>
+                        <li><a href='signup.php'>Sign Up</a></li>
+                        <li><a href='login.php'>Login</a></li>
+                    </div>
+                    <div class="nav-group">
+                        <li><a href='basket.php'>Smart Basket</a></li>
+                        <li><a href='stafflogin.php'>Staff Login</a></li>
+                    </div>
+                <?php } else if (isset($_SESSION['usertype']) && $_SESSION['usertype'] == 'A') { ?>
+                    <div class="nav-group">
+                        <li><a href='index.php'>Home Tech</a></li>
+                        <li><a href='aboutus.php'>About Us</a></li>
+                        <li><a href='logout.php'>Logout</a></li>
+                    </div>
+                    <div class="nav-group">
+                        <li><a href='addproduct.php'>Add Product</a></li>
+                        <li><a href='processorders.php'>Process Orders</a></li>
+                    </div>
+                <?php } else { ?>
+                    <div class="nav-group">
+                        <li><a href='index.php'>Home Tech</a></li>
+                        <li><a href='aboutus.php'>About Us</a></li>
+                        <li><a href='logout.php'>Logout</a></li>
+                    </div>
+                    <div class="nav-group">
+                        <li><a href='basket.php'>Smart Basket</a></li>
+                        <li><a href='myorders.php'>My Orders</a></li>
+                    </div>
+                <?php } ?>
+            </ul>
+        </nav>
+    </div>
+    <div id='content'>
