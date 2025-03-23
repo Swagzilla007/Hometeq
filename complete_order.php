@@ -3,8 +3,11 @@ session_start();
 include("db.php");
 
 // Check if user is logged in and is an administrator
-if (!isset($_SESSION['userid']) || $_SESSION['usertype'] != 'A') {
-    header('Location: stafflogin.php');
+if (!isset($_SESSION['userid'])) {
+    header('Location: login.php');
+    exit();
+} else if ($_SESSION['usertype'] != 'A') {
+    header('Location: index.php');
     exit();
 }
 
@@ -18,11 +21,10 @@ if (isset($_POST['order_id'])) {
         mysqli_stmt_bind_param($stmt, "i", $orderno);
         
         if (mysqli_stmt_execute($stmt)) {
-            // Redirect back to order details with success message
-            header("Location: orderdetails.php?orderno=".$orderno."&status=completed");
+            // Redirect back to process orders with status update
+            header("Location: processorders.php?status=completed");
         } else {
-            // Redirect back with error
-            header("Location: orderdetails.php?orderno=".$orderno."&status=error");
+            header("Location: processorders.php?status=error");
         }
         mysqli_stmt_close($stmt);
     }

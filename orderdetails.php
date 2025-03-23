@@ -2,9 +2,9 @@
 session_start();
 include("db.php");
 
-// Check if user is logged in and is an administrator
-if (!isset($_SESSION['userid']) || $_SESSION['usertype'] != 'A') {
-    header('Location: stafflogin.php');
+// Check if user is logged in
+if (!isset($_SESSION['userid'])) {
+    header('Location: login.php');
     exit();
 }
 
@@ -17,6 +17,30 @@ echo "<h4>".$pagename."</h4>";
 
 if (isset($_GET['orderno'])) {
     $orderno = $_GET['orderno'];
+    
+    // Check if user has access to this order
+    $accessSQL = "SELECT userId FROM Orders WHERE orderNo = ?";
+    $accessStmt = mysqli_prepare($conn, $accessSQL);
+    mysqli_stmt_bind_param($accessStmt, "i", $orderno);
+    mysqli_stmt_execute($accessStmt);
+    $accessResult = mysqli_stmt_get_result($accessStmt);
+    $orderData = mysqli_fetch_array($accessResult);
+    mysqli_stmt_close($accessStmt);
+
+    // Only allow access if user is admin or order belongs to user
+    if ($_SESSION['usertype'] != 'A' && $orderData['userId'] != $_SESSION['userid']) {
+        header('Location: myorders.php');
+        exit();
+    }
+    
+    // Get order status first
+    $statusSQL = "SELECT orderStatus FROM Orders WHERE orderNo = ?";
+    $statusStmt = mysqli_prepare($conn, $statusSQL);
+    mysqli_stmt_bind_param($statusStmt, "i", $orderno);
+    mysqli_stmt_execute($statusStmt);
+    $statusResult = mysqli_stmt_get_result($statusStmt);
+    $orderStatus = mysqli_fetch_array($statusResult)['orderStatus'];
+    mysqli_stmt_close($statusStmt);
     
     // Get order details with product information
     $SQL = "SELECT Order_Line.*, Products.prodName, Products.prodPrice 
@@ -55,16 +79,46 @@ if (isset($_GET['orderno'])) {
             echo "<td>&pound;".number_format($total, 2)."</td>";
             echo "</tr>";
             echo "</table>";
+            
+            echo "<div style='margin: 20px 0;'>";
+            echo "<p><strong>Order Status:</strong> ";
+            if ($_SESSION['usertype'] == 'A') {
+                // Admin view
+                if($orderStatus != 'Completed' && $orderStatus != 'Received') {
+                    echo $orderStatus;
+                    echo "<form action='complete_order.php' method='post' style='margin-top: 10px;'>";
+                    echo "<input type='hidden' name='order_id' value='".$orderno."'>";
+                    echo "<input type='submit' value='Mark Order as Completed' id='submitbtn'>";
+                    echo "</form>";
+                } else {
+                    echo $orderStatus == 'Received' ? "Order completed successfully" : $orderStatus;
+                }
+            } else {
+                // Customer view
+                if($orderStatus == 'Completed') {
+                    echo "Arriving to your address";
+                    echo "<form action='receive_order.php' method='post' style='margin-top: 10px;'>";
+                    echo "<input type='hidden' name='order_id' value='".$orderno."'>";
+                    echo "<input type='submit' value='Order Received' id='submitbtn'>";
+                    echo "</form>";
+                } else if($orderStatus == 'Received') {
+                    echo "Order received successfully";
+                } else {
+                    echo $orderStatus;
+                }
+            }
+            echo "</p>";
+            echo "</div>";
         } else {
             echo "<p>No items found for this order.</p>";
         }
         mysqli_stmt_close($stmt);
     }
     
-    echo "<p><a href='processorders.php'>Back to Orders List</a></p>";
+    echo "<p><a href='".($_SESSION['usertype'] == 'A' ? 'processorders.php' : 'myorders.php')."'>Back to Orders List</a></p>";
 } else {
     echo "<p>No order number specified.</p>";
-    echo "<p><a href='processorders.php'>Back to Orders List</a></p>";
+    echo "<p><a href='".($_SESSION['usertype'] == 'A' ? 'processorders.php' : 'myorders.php')."'>Back to Orders List</a></p>";
 }
 
 include("footfile.html");

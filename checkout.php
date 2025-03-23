@@ -1,6 +1,13 @@
 <?php
 session_start();
 include("db.php");
+
+// Redirect admins away from checkout
+if (isset($_SESSION['usertype']) && $_SESSION['usertype'] == 'A') {
+    header('Location: index.php');
+    exit();
+}
+
 mysqli_report(MYSQLI_REPORT_OFF); //this turns off error reporting to the user
 $pagename="Checkout"; //Create and populate a variable called $pagename
 echo "<link rel=stylesheet type=text/css href=mystylesheet.css>"; //Call in stylesheet
@@ -42,11 +49,20 @@ if (mysqli_query($conn, $SQL) and isset($_SESSION['basket']) and count($_SESSION
             if($arrayb = mysqli_fetch_array($result)) {
                 $subtotal = $value * $arrayb['prodPrice'];
                 
+                // Insert order line
                 $stmtLine = mysqli_prepare($conn, "INSERT INTO Order_Line (orderNo, prodId, quantityOrdered, subTotal) VALUES (?, ?, ?, ?)");
                 if ($stmtLine) {
                     mysqli_stmt_bind_param($stmtLine, "iiid", $orderno, $index, $value, $subtotal);
                     mysqli_stmt_execute($stmtLine);
                     mysqli_stmt_close($stmtLine);
+                    
+                    // Update product quantity
+                    $stmtUpdate = mysqli_prepare($conn, "UPDATE Products SET prodQuantity = prodQuantity - ? WHERE prodId = ?");
+                    if ($stmtUpdate) {
+                        mysqli_stmt_bind_param($stmtUpdate, "ii", $value, $index);
+                        mysqli_stmt_execute($stmtUpdate);
+                        mysqli_stmt_close($stmtUpdate);
+                    }
                     
                     echo "<tr>";
                     echo "<td>".$arrayb['prodName']."</td>";

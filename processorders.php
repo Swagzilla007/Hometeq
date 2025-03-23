@@ -10,10 +10,26 @@ if (!isset($_SESSION['userid']) || $_SESSION['usertype'] != 'A') {
 
 $pagename="Process Orders";
 echo "<link rel=stylesheet type=text/css href=mystylesheet.css>";
+// Add meta tags and JavaScript to prevent caching
+echo "<meta http-equiv='Cache-Control' content='no-cache, no-store, must-revalidate'>";
+echo "<meta http-equiv='Pragma' content='no-cache'>";
+echo "<meta http-equiv='Expires' content='0'>";
+echo "<script>
+    if (window.performance && window.performance.navigation.type === 2) {
+        window.location.reload();
+    }
+</script>";
 echo "<title>".$pagename."</title>";
 echo "<body>";
 include ("headfile.html");
 echo "<h4>".$pagename."</h4>";
+
+// Add message if status was updated
+if (isset($_GET['status'])) {
+    if ($_GET['status'] == 'completed') {
+        echo "<p style='color: green'>Order status updated successfully!</p>";
+    }
+}
 
 // Get all orders with user details
 $SQL = "SELECT Orders.*, Users.userFName, Users.userSName, Users.userAddress, Users.userPostCode
@@ -44,12 +60,16 @@ if (mysqli_num_rows($exeSQL) == 0) {
         echo "<td>".$order['userAddress']."<br>".$order['userPostCode']."</td>";
         echo "<td>".$order['orderDateTime']."</td>";
         echo "<td>";
-        echo $order['orderStatus'];
-        if($order['orderStatus'] != 'Completed') {
-            echo "<form action='complete_order.php' method='post' style='margin-top: 5px;'>";
-            echo "<input type='hidden' name='order_id' value='".$order['orderNo']."'>";
-            echo "<input type='submit' value='Complete' id='submitbtn'>";
-            echo "</form>";
+        if($order['orderStatus'] == 'Received') {
+            echo "Order completed successfully";
+        } else {
+            echo $order['orderStatus'];
+            if($order['orderStatus'] != 'Completed') {
+                echo "<form action='complete_order.php' method='post' style='margin-top: 5px;'>";
+                echo "<input type='hidden' name='order_id' value='".$order['orderNo']."'>";
+                echo "<input type='submit' value='Complete' id='submitbtn'>";
+                echo "</form>";
+            }
         }
         echo "</td>";
         echo "<td>&pound;".number_format($order['orderTotal'], 2)."</td>";
